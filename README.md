@@ -31,13 +31,14 @@ Yeah, you need to register for an account.
 Unpack the JDK somewhere, for example to /opt.
 ```
 $ cd /opt/
+$ wget <whatever_url>
 $ tar -xf jdk-8u381-linux-aarch64.tar.gz
 ```
 
 &nbsp;
 
 #### Run the installer
-...like this
+...like this:
 ```
 $ app_java_home="/opt/jdk1.8.0_381" sh ibgateway-latest-standalone-linux-x64.sh
 
@@ -52,7 +53,7 @@ then click Next.
 Where should IB Gateway 10.23 be installed?
 
 ```
-while passing the folder with your Oracle JDK as the "app_java_home" parameter.
+...while passing your Oracle JDK folder as the "app_java_home" parameter.
 
 You might need to change "sh" to "bash", based on your circumstances.
 
@@ -126,7 +127,7 @@ The solution for me was to download [Bellsoft Liberica JDK](https://bell-sw.com/
 
 I have downloaded JDK 11 LTS / 64-bit / Linux / ARM / Package: Full JDK. For me it was https://download.bell-sw.com/java/11.0.20+8/bellsoft-jdk11.0.20+8-linux-aarch64-full.deb.
 
-Install it
+Install it:
 ```
 $ dpkg -i bellsoft-jdk11.0.20+8-linux-aarch64-full.deb
 Selecting previously unselected package bellsoft-java11-full.
@@ -142,7 +143,7 @@ dpkg: error processing package bellsoft-java11-full (--install):
 Errors were encountered while processing:
  bellsoft-java11-full
 ```
-I have encountered a small problem, but the fix was quick.
+I have encountered a small problem, but there was a quick fix.
 
 ```
 $ apt-get install libasound2
@@ -189,10 +190,16 @@ and it works!
 $ cd ibc
 $ ./gatewaystart.sh
 ```
-Should fire up your gateway.
+IBC should fire up your gateway after a short delay.
 
 &nbsp;
 
 #### Conclusion
 
 I am NOT using Raspberry OS and I am not running a window manager, only xvfb / virtual framebuffer at the moment ("headless" gateway).
+
+TWS is not great, but bearably responsive. Mind you I am connecting over internet to my RPI using xrdp and through a jumpbox on top.
+
+And I am running from SD card.
+
+Please let me know if you made it to work easier, better or faster.
