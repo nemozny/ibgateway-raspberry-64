@@ -70,7 +70,7 @@ Download, install and configure your [IBC](https://github.com/IbcAlpha/IBC).
 out of scope
 ...
 
-After you have set up your IBC, do not forget to make all scripts executable. I made that mistake several types.
+After you have set up your IBC, do not forget to make all scripts executable. I made that mistake several times.
 ```
 $ cd ibc
 $ chmod +x *.sh
@@ -184,7 +184,7 @@ Edit your ibc/gatewaystart.sh script and change JAVA_PATH to
 ```
 JAVA_PATH=/usr/lib/jvm/bellsoft-java11-full-aarch64/bin
 ```
-and it works!
+and it worked! For me.
 
 ```
 $ cd ibc
@@ -198,8 +198,8 @@ IBC should fire up your gateway after a short delay.
 
 I am NOT using Raspberry OS and I am not running a window manager, only xvfb / virtual framebuffer at the moment ("headless" gateway).
 
-TWS is not great, but bearably responsive. Mind you I am connecting over internet to my RPI using xrdp and through a jumpbox on top.
+TWS is not great, but bearably responsive. Mind you I am connecting over internet to my RPI using xrdp and through a SSH jumpbox on top.
 
-And I am running from SD card.
+I am running from SD card.
 
 Please let me know if you made it to work easier, better or faster.
