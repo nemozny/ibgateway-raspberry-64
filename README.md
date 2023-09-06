@@ -3,6 +3,13 @@ Running Interactive Brokers gateway on Raspberry 4B and Debian 64-bit
 
 &nbsp;
 
+Read this and other Raspberry Pi guides here
+* [How to get Argon One v2 fan control working on Raspberry 4B and Debian 64](https://nemozny.github.io/argonone-debian-64/)
+* [Running Interactive Brokers gateway on Raspberry 4B and Debian 64-bit](https://nemozny.github.io/ibgateway-raspberry-64/)
+* [Share your Raspberry Debian 64-bit physical desktop remotely with x11vnc](https://nemozny.github.io/vnc-share-physical-monitor/)
+
+&nbsp;
+
 #### Credits
 This thread helped me immensely - https://groups.io/g/twsapi/topic/install_tws_or_ib_gateway_on/25165590
 
