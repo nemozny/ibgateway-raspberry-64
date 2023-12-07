@@ -1,5 +1,5 @@
 # ibgateway-raspberry-64
-Running Interactive Brokers gateway on Raspberry 4B and Debian 64-bit
+Running Interactive Brokers Gateway on Raspberry 4B + Debian 64-bit or Raspberry 5 + Raspberry Pi OS 64-bit
 
 &nbsp;
 
@@ -15,8 +15,10 @@ This thread helped me immensely - https://groups.io/g/twsapi/topic/install_tws_o
 
 &nbsp;
 
-#### Install Debian 64-bit
+#### Install Debian 64-bit on RPI 4B
 Source - https://raspi.debian.net/tested-images/
+
+or a regular RPI OS 64-bit on RPI 5.
 
 &nbsp;
 
@@ -134,6 +136,8 @@ The solution for me was to download [Bellsoft Liberica JDK](https://bell-sw.com/
 
 I have downloaded JDK 11 LTS / 64-bit / Linux / ARM / Package: Full JDK. For me it was https://download.bell-sw.com/java/11.0.20+8/bellsoft-jdk11.0.20+8-linux-aarch64-full.deb.
 
+Note: I have used JDK 17 LTS for RPI 5.
+
 Install it:
 ```
 $ dpkg -i bellsoft-jdk11.0.20+8-linux-aarch64-full.deb
@@ -150,7 +154,7 @@ dpkg: error processing package bellsoft-java11-full (--install):
 Errors were encountered while processing:
  bellsoft-java11-full
 ```
-I have encountered a small problem, but there was a quick fix.
+I have encountered a small problem on RPI 4B (no error on RPI 5), but there was a quick fix.
 
 ```
 $ apt-get install libasound2
@@ -191,7 +195,7 @@ Edit your ibc/gatewaystart.sh script and change JAVA_PATH to
 ```
 JAVA_PATH=/usr/lib/jvm/bellsoft-java11-full-aarch64/bin
 ```
-and it worked! For me.
+and it worked! For me. Both on RPI 4B and RPI 5.
 
 ```
 $ cd ibc
@@ -201,7 +205,13 @@ IBC should fire up your gateway after a short delay.
 
 &nbsp;
 
-#### Conclusion
+#### Conclusion for RPI 5
+
+TODO
+
+&nbsp;
+
+#### Conclusion for RPI 4B
 
 I am NOT using Raspberry OS and I am not running a window manager, only xvfb / virtual framebuffer at the moment ("headless" gateway).
 
