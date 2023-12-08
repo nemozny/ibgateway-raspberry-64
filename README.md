@@ -136,7 +136,7 @@ The solution for me was to download [Bellsoft Liberica JDK](https://bell-sw.com/
 
 I have downloaded JDK 11 LTS / 64-bit / Linux / ARM / Package: Full JDK. For me it was https://download.bell-sw.com/java/11.0.20+8/bellsoft-jdk11.0.20+8-linux-aarch64-full.deb.
 
-Note: I have used JDK 17 LTS for RPI 5.
+Note: I have used JDK 17 LTS for RPI 5 and it did NOT work. TWS froze after authentication while "loading window managers", or something like that.
 
 Install it:
 ```
@@ -207,7 +207,7 @@ IBC should fire up your gateway after a short delay.
 
 #### Conclusion for RPI 5
 
-TODO
+Avoid Bellsoft Liberica JDK version 17.
 
 &nbsp;
 
