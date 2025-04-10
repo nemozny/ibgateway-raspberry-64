@@ -15,10 +15,9 @@ This thread helped me immensely - https://groups.io/g/twsapi/topic/install_tws_o
 
 &nbsp;
 
-#### Install Debian 64-bit on RPI 4B
-Source - https://raspi.debian.net/tested-images/
-
-or a regular RPI OS 64-bit on RPI 5.
+#### Install OS
+* Raspberry 4B = Debian 64-bit on RPI 4B from https://raspi.debian.net/tested-images/
+* Raspberry 5 - regular RPI OS 64-bit
 
 &nbsp;
 
@@ -31,6 +30,10 @@ $ wget https://download2.interactivebrokers.com/installers/tws/latest-standalone
 &nbsp;
 
 #### Download Oracle JDK
+**!! Note as of 2025/04, using Oracle JDK v8 failed to start the TWS installer due to "Unrecognized option: --add-opens" error. 
+Later in the process TWS requested "The version of the JVM must be 17.0.10.0.101", so maybe you need to download Oracle JDK v17 instead. I don't know, since I used the Bellsoft JDK for both installation and runtime.**
+
+
 Download [Java SE Development Kit 8uXXX](https://www.oracle.com/java/technologies/downloads/#java8) (Java 8). You may find it towards the end of the page.
 
 Specifically **Linux / ARM64 Compressed Archive**, in my case it was **jdk-8u381-linux-aarch64.tar.gz**.
@@ -43,6 +46,10 @@ $ cd /opt/
 $ wget <whatever_url>
 $ tar -xf jdk-8u381-linux-aarch64.tar.gz
 ```
+
+&nbsp;
+
+Or download Bellsoft Liberica JDK, see further below, and try your luck without Oracle JDK. Which worked for me on 2025/04.
 
 &nbsp;
 
@@ -63,6 +70,12 @@ Where should IB Gateway 10.23 be installed?
 
 ```
 ...while passing your Oracle JDK folder as the "app_java_home" parameter.
+
+Or with Bellsoft JDK it is
+```
+$ app_java_home="/usr/lib/jvm/bellsoft-java11-aarch64" sh ibgateway-latest-standalone-linux-x64.sh
+```
+With the case of Bellsoft JDK, I had to run this installer in Raspberry GUI / Window Manager, not just remotely in the shell, else it failed looking for some Java GUI components.
 
 You might need to change "sh" to "bash", based on your circumstances.
 
