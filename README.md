@@ -16,8 +16,8 @@ This thread helped me immensely - https://groups.io/g/twsapi/topic/install_tws_o
 &nbsp;
 
 #### Install OS
-* Raspberry 4B = Debian 64-bit on RPI 4B from https://raspi.debian.net/tested-images/
-* Raspberry 5 - regular RPI OS 64-bit
+* Raspberry 4B - tested on Debian 64-bit from https://raspi.debian.net/tested-images/
+* Raspberry 5 - tested on regular RPI OS 64-bit
 
 &nbsp;
 
@@ -29,9 +29,46 @@ $ wget https://download2.interactivebrokers.com/installers/tws/latest-standalone
 
 &nbsp;
 
-#### Download Oracle JDK
-**!! Note as of 2025/04, using Oracle JDK v8 failed to start the TWS installer due to "Unrecognized option: --add-opens" error. 
-Later in the process TWS requested "The version of the JVM must be 17.0.10.0.101", so maybe you need to download Oracle JDK v17 instead. I don't know, since I used the Bellsoft JDK for both installation and runtime.**
+#### Bellsoft Liberica JDK
+Download [Bellsoft Liberica JDK](https://bell-sw.com/pages/downloads/), which bundles all Java modules that IB gateway needed.
+
+(2025) I have downloaded JDK 17 LTS / 64-bit / Linux / ARM / Package: Full JDK. 
+
+For me it was https://download.bell-sw.com/java/17.0.14+10/bellsoft-jdk17.0.14+10-linux-aarch64-full.deb.
+
+(2023) I have downloaded JDK 11 LTS / 64-bit / Linux / ARM / Package: Full JDK. 
+
+For me it was https://download.bell-sw.com/java/11.0.20+8/bellsoft-jdk11.0.20+8-linux-aarch64-full.deb.
+
+Don't forget to switch to "Full JDK"!
+
+![bellsoft](https://github.com/user-attachments/assets/c011b324-ec14-4ed0-8825-1eb728142b13)
+
+
+Install it:
+```
+$ dpkg -i bellsoft-jdk11.0.20+8-linux-aarch64-full.deb
+Selecting previously unselected package bellsoft-java11-full.
+(Reading database ... 28164 files and directories currently installed.)
+Preparing to unpack bellsoft-jdk11.0.20+8-linux-aarch64-full.deb ...
+Unpacking bellsoft-java11-full (11.0.20+8) ...
+dpkg: dependency problems prevent configuration of bellsoft-java11-full:
+ bellsoft-java11-full depends on libasound2; however:
+  Package libasound2 is not installed.
+
+dpkg: error processing package bellsoft-java11-full (--install):
+ dependency problems - leaving unconfigured
+Errors were encountered while processing:
+ bellsoft-java11-full
+```
+
+After a successful installation you can find your new JDK in /usr/lib/jvm/bellsoft-java11-full-aarch64/bin.
+
+&nbsp;
+
+#### Alternatively download Oracle JDK (Raspberry 4B)
+**_As of 2025/04, using Oracle JDK v8 failed to start the TWS installer due to "Unrecognized option: --add-opens" error. 
+Later in the process TWS requested "The version of the JVM must be 17.0.10.0.101", so maybe you need to download Oracle JDK v17 instead. I don't know, since I used the Bellsoft JDK for both installation and runtime._**
 
 
 Download [Java SE Development Kit 8uXXX](https://www.oracle.com/java/technologies/downloads/#java8) (Java 8). You may find it towards the end of the page.
@@ -40,21 +77,28 @@ Specifically **Linux / ARM64 Compressed Archive**, in my case it was **jdk-8u381
 
 Yeah, you need to register for an account.
 
-Unpack the JDK somewhere, for example to /opt.
+Unpack the JDK somewhere, for example to /opt. There is no installation.
 ```
 $ cd /opt/
 $ wget <whatever_url>
 $ tar -xf jdk-8u381-linux-aarch64.tar.gz
 ```
 
-&nbsp;
-
-Or download Bellsoft Liberica JDK, see further below, and try your luck without Oracle JDK. Which worked for me on 2025/04.
 
 &nbsp;
 
 #### Run the installer
 ...like this:
+```
+$ app_java_home="/usr/lib/jvm/bellsoft-java11-aarch64" sh ibgateway-latest-standalone-linux-x64.sh
+
+
+```
+...while passing your Bellsoft JDK folder as the "app_java_home" parameter.
+
+With Bellsoft JDK, I had to run this installer in Raspberry GUI / Window Manager, not just remotely in the shell, or else it failed looking for some Java GUI components.
+
+With Oracle JDK it is (if unpacked to /opt)
 ```
 $ app_java_home="/opt/jdk1.8.0_381" sh ibgateway-latest-standalone-linux-x64.sh
 
@@ -67,15 +111,8 @@ Click Next to continue, or Cancel to exit Setup.
 Select the folder where you would like IB Gateway 10.23 to be installed,
 then click Next.
 Where should IB Gateway 10.23 be installed?
+```
 
-```
-...while passing your Oracle JDK folder as the "app_java_home" parameter.
-
-Or with Bellsoft JDK it is
-```
-$ app_java_home="/usr/lib/jvm/bellsoft-java11-aarch64" sh ibgateway-latest-standalone-linux-x64.sh
-```
-With the case of Bellsoft JDK, I had to run this installer in Raspberry GUI / Window Manager, not just remotely in the shell, else it failed looking for some Java GUI components.
 
 You might need to change "sh" to "bash", based on your circumstances.
 
@@ -89,7 +126,7 @@ I could not make it work **without** [IBC](https://github.com/IbcAlpha/IBC). [IB
 Download, install and configure your [IBC](https://github.com/IbcAlpha/IBC).
 
 ...
-out of scope
+IBC configuration is out of scope
 ...
 
 After you have set up your IBC, do not forget to make all scripts executable. I made that mistake several times.
@@ -123,92 +160,14 @@ BTW, you can use these values / scripts to run several gateways in parallel, wit
 
 The single most important argument is the **JAVA_PATH**, though.
 
-You can try and set JAVA_PATH to our earlier JDK
-```
-JAVA_PATH=/opt/jdk1.8.0_381/bin
-```
-but I had no luck with this.
 
-You can always check ibc/logs or Jts/launcher.log for errors and in this case it was:
 
-```
-Error: VM option 'UseG1GC' is experimental and must be enabled via -XX:+UnlockExperimentalVMOptions.
-Error: Could not create the Java Virtual Machine.
-Error: A fatal exception has occurred. Program will exit.
-IBC returned exit status 1
-autorestart file not found
-
-Gateway finished
-```
-I have managed to pass "-XX:+UnlockExperimentalVMOptions" to java by editing the ibc/scripts/ibcstart.sh file, but it did not work either. Gateway was complaining about JavaFX and did not start.
-
-&nbsp;
-
-#### Bellsoft Liberica JDK
-The solution for me was to download [Bellsoft Liberica JDK](https://bell-sw.com/pages/downloads/), which bundles all modules that IB gateway needed.
-
-I have downloaded JDK 11 LTS / 64-bit / Linux / ARM / Package: Full JDK. For me it was https://download.bell-sw.com/java/11.0.20+8/bellsoft-jdk11.0.20+8-linux-aarch64-full.deb.
-
-Note: I have used JDK 17 LTS for RPI 5 and it did NOT work. TWS froze after authentication while "loading window managers", or something like that.
-
-Install it:
-```
-$ dpkg -i bellsoft-jdk11.0.20+8-linux-aarch64-full.deb
-Selecting previously unselected package bellsoft-java11-full.
-(Reading database ... 28164 files and directories currently installed.)
-Preparing to unpack bellsoft-jdk11.0.20+8-linux-aarch64-full.deb ...
-Unpacking bellsoft-java11-full (11.0.20+8) ...
-dpkg: dependency problems prevent configuration of bellsoft-java11-full:
- bellsoft-java11-full depends on libasound2; however:
-  Package libasound2 is not installed.
-
-dpkg: error processing package bellsoft-java11-full (--install):
- dependency problems - leaving unconfigured
-Errors were encountered while processing:
- bellsoft-java11-full
-```
-I have encountered a small problem on RPI 4B (no error on RPI 5), but there was a quick fix.
-
-```
-$ apt-get install libasound2
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
-You might want to run 'apt --fix-broken install' to correct these.
-The following packages have unmet dependencies:
- libasound2 : Depends: libasound2-data (>= 1.2.8-1) but it is not going to be installed
-E: Unmet dependencies. Try 'apt --fix-broken install' with no packages (or specify a solution).
-```
-```
-$ apt --fix-broken install
-Reading package lists... Done
-Building dependency tree... Done
-Reading state information... Done
-Correcting dependencies... Done
-The following additional packages will be installed:
-  alsa-topology-conf alsa-ucm-conf libasound2 libasound2-data
-Suggested packages:
-  libasound2-plugins alsa-utils
-The following NEW packages will be installed:
-  alsa-topology-conf alsa-ucm-conf libasound2 libasound2-data
-0 upgraded, 4 newly installed, 0 to remove and 1 not upgraded.
-1 not fully installed or removed.
-Need to get 414 kB of archives.
-After this operation, 2566 kB of additional disk space will be used.
-Do you want to continue? [Y/n]
-```
-libasound2 unblocked bellsoft-java11-full and it finished its setup.
-
-After a successful installation you can find your new JDK in /usr/lib/jvm/bellsoft-java11-full-aarch64/bin.
-
-&nbsp;
-
-#### Running the gateway once more
+#### Running the gateway
 Edit your ibc/gatewaystart.sh script and change JAVA_PATH to
 ```
 JAVA_PATH=/usr/lib/jvm/bellsoft-java11-full-aarch64/bin
 ```
-and it worked! For me. Both on RPI 4B and RPI 5.
+or whichever version you have used.
 
 ```
 $ cd ibc
@@ -216,20 +175,3 @@ $ ./gatewaystart.sh
 ```
 IBC should fire up your gateway after a short delay.
 
-&nbsp;
-
-#### Conclusion for RPI 5
-
-Avoid Bellsoft Liberica JDK version 17.
-
-&nbsp;
-
-#### Conclusion for RPI 4B
-
-I am NOT using Raspberry OS and I am not running a window manager, only xvfb / virtual framebuffer at the moment ("headless" gateway).
-
-TWS is not great, but bearably responsive. Mind you I am connecting over internet to my RPI using xrdp and through a SSH jumpbox on top.
-
-I am running from SD card.
-
-Please let me know if you made it to work easier, better or faster.
