@@ -10,18 +10,18 @@ Read this and other Raspberry Pi guides here
 
 &nbsp;
 
-#### Credits
+### Credits
 This thread helped me immensely - https://groups.io/g/twsapi/topic/install_tws_or_ib_gateway_on/25165590
 
 &nbsp;
 
-#### Install OS
+### Install OS
 * Raspberry 4B - tested on Debian 64-bit from https://raspi.debian.net/tested-images/
 * Raspberry 5 - tested on regular RPI OS 64-bit
 
 &nbsp;
 
-#### Download ibgateway/tws
+### Download ibgateway/tws
 ```
 $ wget https://download2.interactivebrokers.com/installers/ibgateway/latest-standalone/ibgateway-latest-standalone-linux-x64.sh
 $ wget https://download2.interactivebrokers.com/installers/tws/latest-standalone/tws-latest-standalone-linux-x64.sh
@@ -29,7 +29,7 @@ $ wget https://download2.interactivebrokers.com/installers/tws/latest-standalone
 
 &nbsp;
 
-#### Bellsoft Liberica JDK
+### Bellsoft Liberica JDK
 Download [Bellsoft Liberica JDK](https://bell-sw.com/pages/downloads/), which bundles all Java modules that IB gateway needed.
 
 (2025) I have downloaded JDK 17 LTS / 64-bit / Linux / ARM / Package: Full JDK. 
@@ -66,10 +66,11 @@ After a successful installation you can find your new JDK in /usr/lib/jvm/bellso
 
 &nbsp;
 
-#### Alternatively download Oracle JDK (Raspberry 4B)
-**_As of 2025/04, using Oracle JDK v8 failed to start the TWS installer due to "Unrecognized option: --add-opens" error. 
-Later in the process TWS requested "The version of the JVM must be 17.0.10.0.101", so maybe you need to download Oracle JDK v17 instead. I don't know, since I used the Bellsoft JDK for both installation and runtime._**
+Update October 2025: Back in 2023 I had to run the installer using OpenJDK and then run the actual gateway/TWS using Bellsoft Java. That was no longer true in 2025, you can use Bellsoft for both. If you run into problems with the installer, you can try OpenJDK, but it will never work to run gateway/TWS, those only work with Bellsoft.
 
+&nbsp;
+
+#### Update October 2025: You don't need Oracle JDK, use only Bellsoft
 
 Download [Java SE Development Kit 8uXXX](https://www.oracle.com/java/technologies/downloads/#java8) (Java 8). You may find it towards the end of the page.
 
@@ -87,40 +88,22 @@ $ tar -xf jdk-8u381-linux-aarch64.tar.gz
 
 &nbsp;
 
-#### Run the installer
-...like this:
+### Run the Gateway/TWS installer
+Run the installer like this:
 ```
 $ app_java_home="/usr/lib/jvm/bellsoft-java11-aarch64" sh ibgateway-latest-standalone-linux-x64.sh
-
-
 ```
 ...while passing your Bellsoft JDK folder as the "app_java_home" parameter.
 
-With Bellsoft JDK, I had to run this installer in Raspberry GUI / Window Manager, not just remotely in the shell, or else it failed looking for some Java GUI components.
-
-With Oracle JDK it is (if unpacked to /opt)
-```
-$ app_java_home="/opt/jdk1.8.0_381" sh ibgateway-latest-standalone-linux-x64.sh
-
-Starting Installer ...
-Welcome to the IB Gateway 10.23 Setup Wizard
-This will install IB Gateway 10.23 on your computer. The wizard will lead
-you step by step through the installation.
-
-Click Next to continue, or Cancel to exit Setup.
-Select the folder where you would like IB Gateway 10.23 to be installed,
-then click Next.
-Where should IB Gateway 10.23 be installed?
-```
-
+(Update October 2025: No longer true, running from remote shell worked fine) With Bellsoft JDK, I had to run this installer in Raspberry GUI / Window Manager, not just remotely in the shell, or else it failed looking for some Java GUI components.
 
 You might need to change "sh" to "bash", based on your circumstances.
 
-The same argument applies for the TWS installer.
+The same then applies for the TWS installer.
 
 &nbsp;
 
-#### Running the gateway
+### Configuring the gateway
 I could not make it work **without** [IBC](https://github.com/IbcAlpha/IBC). [IBC](https://github.com/IbcAlpha/IBC) passes some additional arguments to Java and I have always tried to keep my distance from Java.
 
 Download, install and configure your [IBC](https://github.com/IbcAlpha/IBC).
@@ -161,17 +144,46 @@ BTW, you can use these values / scripts to run several gateways in parallel, wit
 The single most important argument is the **JAVA_PATH**, though.
 
 
-
-#### Running the gateway
 Edit your ibc/gatewaystart.sh script and change JAVA_PATH to
 ```
 JAVA_PATH=/usr/lib/jvm/bellsoft-java11-full-aarch64/bin
 ```
 or whichever version you have used.
 
+### Running the gateway
+
 ```
 $ cd ibc
 $ ./gatewaystart.sh
 ```
 IBC should fire up your gateway after a short delay.
+
+&nbsp;
+
+### Start the gateway from a script or cron
+In my python scripts I am starting the gateway before any actual processing starts. However the gateway/TWS can only run in GUI, it cannot run headless, in shell. For graphical environment you can use whatever GNOME / KDE came with your desktop. On server without a physical screen you can replace X server with "xvfb" - Virtual Framebuffer 'fake' X server. There are plenty of HOWTO's over the internet.
+
+In any case, if you execute your scripts from a remote shell, not from shell on your physical/virtual screen, you need to pass the DISPLAY variable to project the application on the X display. You also need to avoid the modern Wayland, since Wayland is a communication protocol and not a server like X11, so AFAIK you can NOT do the above with Wayland. Wayland does not provide the DISPLAY variable and WAYLAND_DISPLAY does not work.
+
+For further reading see [https://github.com/nemozny/vnc-share-physical-monitor](https://github.com/nemozny/vnc-share-physical-monitor).
+
+Update your IBC scripts (twsstart.sh and gatewaystart.sh), at the very end of the script you can see:
+```
+if [[ "$1" == "-inline" ]]; then
+    exec "${IBC_PATH}/scripts/displaybannerandlaunch.sh"
+else
+    title="IBC ($APP $TWS_MAJOR_VRSN)"
+    xterm $iconic -T "$title" -e "${IBC_PATH}/scripts/displaybannerandlaunch.sh" &
+fi
+```
+First make sure you actually have "xterm". Change xterm for whatever GUI console app you had installed. It happened to me I had "lxterminal" and no "xterm" on a fresh install.
+
+Add "DISPLAY=:0" to the second to last line:
+```
+    DISPLAY=:0 xterm $iconic -T "$title" -e "${IBC_PATH}/scripts/displaybannerandlaunch.sh" &
+fi
+```
+This will run the app in your X session.
+
+You can then kill the app by running a shell command "pkill java".
 
