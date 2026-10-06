@@ -88,7 +88,17 @@ The same applies to the TWS installer.
 
 &nbsp;
 
-### Configuring the gateway
+### Running TWS / Gateway in GUI
+Installers create desktop shortcuts by default. To start the app using the shortcut, prepend
+```
+env app_java_home="/usr/lib/jvm/bellsoft-java25-full-aarch64"
+```
+to the shortcut command. For example the full command will look like this
+```
+env app_java_home="/usr/lib/jvm/bellsoft-java25-full-aarch64" "/home/nemozny/Jts/1051/tws" -J-DjtsConfigDir="/home/nemozny/Jts" %U
+```
+
+### Configuring the gateway in headless mode
 I could not make it work **without** [IBC](https://github.com/IbcAlpha/IBC). [IBC](https://github.com/IbcAlpha/IBC) passes some additional arguments to Java and I have always tried to keep my distance from Java.
 
 Download, install and configure your [IBC](https://github.com/IbcAlpha/IBC).
