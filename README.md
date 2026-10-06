@@ -22,6 +22,9 @@ This thread helped me immensely - https://groups.io/g/twsapi/topic/install_tws_o
 &nbsp;
 
 ### Download ibgateway/tws
+There is a new [download portal](https://www.interactivebrokers.com/en/trading/download-tws.php?p=offline-latest).
+
+Direct links:
 ```
 $ wget https://download2.interactivebrokers.com/installers/ibgateway/latest-standalone/ibgateway-latest-standalone-linux-x64.sh
 $ wget https://download2.interactivebrokers.com/installers/tws/latest-standalone/tws-latest-standalone-linux-x64.sh
@@ -32,13 +35,15 @@ $ wget https://download2.interactivebrokers.com/installers/tws/latest-standalone
 ### Bellsoft Liberica JDK
 Download [Bellsoft Liberica JDK](https://bell-sw.com/pages/downloads/), which bundles all Java modules that IB gateway needed.
 
-(2025) I have downloaded JDK 17 LTS / 64-bit / Linux / ARM / Package: Full JDK. 
+* Select version "JDK 25 LTS"
+* Linux
+* Under Linux select ARM
+* Dropdown "Package" select "Full JDK"
+* Download .DEB installer
 
-For me it was https://download.bell-sw.com/java/17.0.14+10/bellsoft-jdk17.0.14+10-linux-aarch64-full.deb.
-
-(2023) I have downloaded JDK 11 LTS / 64-bit / Linux / ARM / Package: Full JDK. 
-
-For me it was https://download.bell-sw.com/java/11.0.20+8/bellsoft-jdk11.0.20+8-linux-aarch64-full.deb.
+In 2026 for TWS/IBGateway versions 10.50+ you need Liberica JDK 25 - for me it was [bellsoft-jdk25.0.4.1+1-linux-aarch64-full.deb](https://download.bell-sw.com/java/25.0.4.1+1/bellsoft-jdk25.0.4.1+1-linux-aarch64-full.deb).  
+In 2025 I have downloaded JDK 17 LTS / 64-bit / Linux / ARM / Package: Full JDK - for me it was [bellsoft-jdk17.0.14+10-linux-aarch64-full.deb](https://download.bell-sw.com/java/17.0.14+10/bellsoft-jdk17.0.14+10-linux-aarch64-full.deb).  
+In 2023 I have downloaded JDK 11 LTS / 64-bit / Linux / ARM / Package: Full JDK - for me it was [bellsoft-jdk11.0.20+8-linux-aarch64-full.deb](https://download.bell-sw.com/java/11.0.20+8/bellsoft-jdk11.0.20+8-linux-aarch64-full.deb).  
 
 Don't forget to switch to "Full JDK"!
 
@@ -47,59 +52,39 @@ Don't forget to switch to "Full JDK"!
 
 Install it:
 ```
-$ dpkg -i bellsoft-jdk11.0.20+8-linux-aarch64-full.deb
-Selecting previously unselected package bellsoft-java11-full.
-(Reading database ... 28164 files and directories currently installed.)
-Preparing to unpack bellsoft-jdk11.0.20+8-linux-aarch64-full.deb ...
-Unpacking bellsoft-java11-full (11.0.20+8) ...
-dpkg: dependency problems prevent configuration of bellsoft-java11-full:
- bellsoft-java11-full depends on libasound2; however:
-  Package libasound2 is not installed.
-
-dpkg: error processing package bellsoft-java11-full (--install):
- dependency problems - leaving unconfigured
-Errors were encountered while processing:
- bellsoft-java11-full
+$ sudo dpkg -i bellsoft-jdk25.0.4.1+1-linux-aarch64-full.deb
+Selecting previously unselected package bellsoft-java25-full.
+(Reading database ... 226787 files and directories currently installed.)
+Preparing to unpack bellsoft-jdk25.0.4.1+1-linux-aarch64-full.deb ...
+Unpacking bellsoft-java25-full (25.0.4.1+1) ...
+Setting up bellsoft-java25-full (25.0.4.1+1) ...
+update-alternatives: using /usr/lib/jvm/bellsoft-java25-full-aarch64/bin/jar to provide /usr/bin/jar (jar) in auto mode
+... omitted ...
+update-alternatives: using /usr/lib/jvm/bellsoft-java25-full-aarch64/bin/serialver to provide /usr/bin/serialver (serialver) in auto mode
 ```
 
-After a successful installation you can find your new JDK in /usr/lib/jvm/bellsoft-java11-full-aarch64/bin.
+After a successful installation you can find your new JDK in /usr/lib/jvm/bellsoft-java25-full-aarch64/bin.
 
 &nbsp;
 
-Update October 2025: Back in 2023 I had to run the installer using OpenJDK and then run the actual gateway/TWS using Bellsoft Java. That was no longer true in 2025, you can use Bellsoft for both. If you run into problems with the installer, you can try OpenJDK, but it will never work to run gateway/TWS, those only work with Bellsoft.
-
-&nbsp;
-
-#### Update October 2025: You don't need Oracle JDK, use only Bellsoft
-
-Download [Java SE Development Kit 8uXXX](https://www.oracle.com/java/technologies/downloads/#java8) (Java 8). You may find it towards the end of the page.
-
-Specifically **Linux / ARM64 Compressed Archive**, in my case it was **jdk-8u381-linux-aarch64.tar.gz**.
-
-Yeah, you need to register for an account.
-
-Unpack the JDK somewhere, for example to /opt. There is no installation.
-```
-$ cd /opt/
-$ wget <whatever_url>
-$ tar -xf jdk-8u381-linux-aarch64.tar.gz
-```
-
+Update October 2025: Back in 2023 I had to run the installer using OpenJDK and then run the actual gateway/TWS using Bellsoft Java. That was no longer necessary in 2025, you can use Bellsoft for both. If you run into problems with the installer, you can try to install with OpenJDK (ie. app_java_home="/opt/jdk1.8.0_441") and then run with Bellsoft.
 
 &nbsp;
 
 ### Run the Gateway/TWS installer
+Updates in 2026:
+Installer was stubbornly using the bundled JRE, not the one I provided with Bellsoft Java. I needed to explicitly disable the bundled JRE using "INSTALL4J_DISABLE_BUNDLED_JRE=true".  
+Then it was trying to run the GUI installer, although I was in CLI. Disable GUI with "-c".  
+
 Run the installer like this:
 ```
-$ app_java_home="/usr/lib/jvm/bellsoft-java11-aarch64" sh ibgateway-latest-standalone-linux-x64.sh
+$ INSTALL4J_DISABLE_BUNDLED_JRE=true  app_java_home="/usr/lib/jvm/bellsoft-java25-full-aarch64" sh ./tws-latest-standalone-linux-x64.sh -c
 ```
-...while passing your Bellsoft JDK folder as the "app_java_home" parameter.
-
-(Update October 2025: No longer true, running from remote shell worked fine) With Bellsoft JDK, I had to run this installer in Raspberry GUI / Window Manager, not just remotely in the shell, or else it failed looking for some Java GUI components.
+...while passing your Bellsoft JDK folder as the "app_java_home" parameter, disabling the bundled JRE and enabling the command line mode.
 
 You might need to change "sh" to "bash", based on your circumstances.
 
-The same then applies for the TWS installer.
+The same applies to the TWS installer.
 
 &nbsp;
 
@@ -146,7 +131,7 @@ The single most important argument is the **JAVA_PATH**, though.
 
 Edit your ibc/gatewaystart.sh script and change JAVA_PATH to
 ```
-JAVA_PATH=/usr/lib/jvm/bellsoft-java11-full-aarch64/bin
+JAVA_PATH=/usr/lib/jvm/bellsoft-java25-full-aarch64/bin
 ```
 or whichever version you have used.
 
