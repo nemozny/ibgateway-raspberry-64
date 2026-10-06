@@ -41,16 +41,20 @@ Download [Bellsoft Liberica JDK](https://bell-sw.com/pages/downloads/), which bu
 * Dropdown "Package" select "Full JDK"
 * Download .DEB installer
 
+#### 2026
 In 2026 for TWS/IBGateway versions 10.50+ you need Liberica JDK 25 - for me it was [bellsoft-jdk25.0.4.1+1-linux-aarch64-full.deb](https://download.bell-sw.com/java/25.0.4.1+1/bellsoft-jdk25.0.4.1+1-linux-aarch64-full.deb).  
+See "Invalid twsInfo" error below.  
+#### 2025
 In 2025 I have downloaded JDK 17 LTS / 64-bit / Linux / ARM / Package: Full JDK - for me it was [bellsoft-jdk17.0.14+10-linux-aarch64-full.deb](https://download.bell-sw.com/java/17.0.14+10/bellsoft-jdk17.0.14+10-linux-aarch64-full.deb).  
+#### 2023
 In 2023 I have downloaded JDK 11 LTS / 64-bit / Linux / ARM / Package: Full JDK - for me it was [bellsoft-jdk11.0.20+8-linux-aarch64-full.deb](https://download.bell-sw.com/java/11.0.20+8/bellsoft-jdk11.0.20+8-linux-aarch64-full.deb).  
 
-Don't forget to switch to "Full JDK"!
+Do not forget to switch to "Full JDK"!
 
 ![bellsoft](https://github.com/user-attachments/assets/c011b324-ec14-4ed0-8825-1eb728142b13)
 
 
-Install it:
+Install the JDK:
 ```
 $ sudo dpkg -i bellsoft-jdk25.0.4.1+1-linux-aarch64-full.deb
 Selecting previously unselected package bellsoft-java25-full.
@@ -67,12 +71,13 @@ After a successful installation you can find your new JDK in /usr/lib/jvm/bellso
 
 &nbsp;
 
-Update October 2025: Back in 2023 I had to run the installer using OpenJDK and then run the actual gateway/TWS using Bellsoft Java. That was no longer necessary in 2025, you can use Bellsoft for both. If you run into problems with the installer, you can try to install with OpenJDK (ie. app_java_home="/opt/jdk1.8.0_441") and then run with Bellsoft.
+#### October 2025
+Back in 2023 I had to run the installer using Oracle JDK and then run the actual gateway/TWS using Bellsoft Java. That was no longer necessary in 2025, you can use Bellsoft for both. If you run into problems with the installer, you can try using Oracle JDK (ie. app_java_home="/opt/jdk1.8.0_441"). Download from [https://www.oracle.com/java/technologies/downloads/#java25](https://www.oracle.com/java/technologies/downloads/).
 
 &nbsp;
 
 ### Run the Gateway/TWS installer
-Updates in 2026:
+#### October 2026
 Installer was stubbornly using the bundled JRE, not the one I provided with Bellsoft Java. I needed to explicitly disable the bundled JRE using "INSTALL4J_DISABLE_BUNDLED_JRE=true".  
 Then it was trying to run the GUI installer, although I was in CLI. Disable GUI with "-c".  
 
@@ -98,8 +103,14 @@ to the shortcut command. For example the full command will look like this
 env app_java_home="/usr/lib/jvm/bellsoft-java25-full-aarch64" "/home/nemozny/Jts/1051/tws" -J-DjtsConfigDir="/home/nemozny/Jts" %U
 ```
 
+&nbsp;
+
 ### Configuring the gateway in headless mode
-I could not make it work **without** [IBC](https://github.com/IbcAlpha/IBC). [IBC](https://github.com/IbcAlpha/IBC) passes some additional arguments to Java and I have always tried to keep my distance from Java.
+#### October 2026
+IBC Project was retired last month by its owner. For now I am using the latest released version, but for the future I may need to investigate https://github.com/code-hustler-ft3d/ibg-controller or some docker image.
+
+
+I was not able to start gateway headless without [IBC](https://github.com/IbcAlpha/IBC), because IBC passes additional arguments to gateway Java executable, so it is possible to use the Bellsoft JDK instead of the bundled JRE.
 
 Download, install and configure your [IBC](https://github.com/IbcAlpha/IBC).
 
@@ -116,7 +127,7 @@ $ chmod +x scripts/*.sh
 
 Edit ibc/gatewaystart.sh or twsstart.sh and at the head of the file there are some basic configuration parameters:
 ```
-TWS_MAJOR_VRSN=1019
+TWS_MAJOR_VRSN=1051
 IBC_INI=~/ibc/config.ini
 TRADING_MODE=
 TWOFA_TIMEOUT_ACTION=exit
@@ -132,11 +143,11 @@ JAVA_PATH=
 HIDE=
 ```
 
-You obviously need to enter your values, such as TWS_MAJOR_VRSN=1023, not 1019.
+Update TWS_MAJOR_VRSN=1051 for 10.51 version (current).
 
-BTW, you can use these values / scripts to run several gateways in parallel, with different configurations, IB logins and on different ports.
+BTW, you can use these values / scripts to run several gateways in parallel, with different configurations, IB logins and on different ports. Just create config-paper.ini with corresponding gatewaystart-paper.sh and config-live.ini with gatewaystart-live.sh.
 
-The single most important argument is the **JAVA_PATH**, though.
+The single most important argument is the **JAVA_PATH** configuration variable.
 
 
 Edit your ibc/gatewaystart.sh script and change JAVA_PATH to
@@ -152,6 +163,14 @@ $ cd ibc
 $ ./gatewaystart.sh
 ```
 IBC should fire up your gateway after a short delay.
+
+&nbsp;
+
+### October 2026: "Invalid twsInfo" error
+After updating to IBC 3.24.2 + tws/gateway 10.51 + Bellsoft JDK 25 I am experiencing the "Invalid twsInfo" after authenticating to TWS/gateway. The application loads configuration and shortly before displaying the GUI it shows the error and crashes.
+
+To fix this you need to install the app using Bellsoft JDK 25, but **run the application using Bellsoft JDK 17**. Do not ask me why.  
+Change JAVA_PATH to "java17" - JAVA_PATH=/usr/lib/jvm/bellsoft-**java17**-full-aarch64/bin in your gatewaystart.sh. And in your desktop shortcut.
 
 &nbsp;
 
